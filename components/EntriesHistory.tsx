@@ -41,12 +41,22 @@ export function EntriesHistory({ entries }: { entries: StepEntry[] }) {
           className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface px-5 py-4"
         >
           <div>
-            <p className="text-2xl font-mono tabular-nums font-semibold">
-              {formatSteps(entry.steps)} pas
-            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-2xl font-mono tabular-nums font-semibold">
+                {formatSteps(entry.steps)} pas
+              </p>
+              {entry.source === "healthkit" && (
+                <span
+                  className="rounded-full px-2.5 py-0.5 text-sm font-medium"
+                  style={{ background: "var(--course)", color: "var(--course-foreground)" }}
+                >
+                  📱 Santé
+                </span>
+              )}
+            </div>
             <p className="text-lg text-muted">
               {formatDate(entry.date)}
-              {entry.note ? ` — ${entry.note}` : ""}
+              {entry.note && entry.source !== "healthkit" ? ` — ${entry.note}` : ""}
             </p>
           </div>
           <button
