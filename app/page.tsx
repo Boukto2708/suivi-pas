@@ -9,6 +9,7 @@ import { AddStepsForm } from "@/components/AddStepsForm";
 import { EntriesHistory } from "@/components/EntriesHistory";
 import { ActivityGoalsSection } from "@/components/ActivityGoalsSection";
 import { RewardsSection } from "@/components/RewardsSection";
+import { ConfettiOverlay } from "@/components/Confetti";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ export default async function Home() {
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-8">
+      <ConfettiOverlay />
       <h1 className="text-center text-4xl font-bold">
         🏃{" "}
         <span

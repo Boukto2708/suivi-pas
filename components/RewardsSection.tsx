@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { createReward, deleteReward } from "@/lib/actions/rewards";
+import { fireConfetti } from "@/components/Confetti";
 import type { Reward } from "@/lib/types";
 
 function AddRewardForm() {
@@ -91,6 +92,16 @@ export function RewardsSection({
   completedCount: number;
 }) {
   const [isPending, startTransition] = useTransition();
+  const prevUnlockedIds = useRef<Set<string> | null>(null);
+
+  useEffect(() => {
+    const nowUnlocked = new Set(rewards.filter((r) => completedCount >= r.threshold).map((r) => r.id));
+    if (prevUnlockedIds.current !== null) {
+      const newlyUnlocked = [...nowUnlocked].some((id) => !prevUnlockedIds.current!.has(id));
+      if (newlyUnlocked) fireConfetti();
+    }
+    prevUnlockedIds.current = nowUnlocked;
+  }, [rewards, completedCount]);
 
   function handleDelete(id: string) {
     if (!confirm("Supprimer cette récompense ?")) return;

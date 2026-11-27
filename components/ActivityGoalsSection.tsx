@@ -7,7 +7,10 @@ import {
   deleteActivityGoal,
   setActivityGoalCompleted,
 } from "@/lib/actions/activityGoals";
+import { fireConfetti } from "@/components/Confetti";
 import { ACTIVITY_TYPE_LABELS, type ActivityGoal, type ActivityType } from "@/lib/types";
+
+type FilterValue = "tous" | ActivityType;
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
@@ -216,21 +219,37 @@ function AddGoalForm() {
   );
 }
 
+const FILTERS: { value: FilterValue; label: string }[] = [
+  { value: "tous", label: "Tous" },
+  { value: "course", label: "🏃 Course" },
+  { value: "marche", label: "🚶 Marche" },
+  { value: "velo", label: "🚴 Vélo" },
+];
+
 export function ActivityGoalsSection({ goals, streak }: { goals: ActivityGoal[]; streak: number }) {
   const [isPending, startTransition] = useTransition();
+  const [filter, setFilter] = useState<FilterValue>("tous");
 
-  const pending = goals.filter((g) => g.completed_at === null);
-  const completed = goals.filter((g) => g.completed_at !== null);
+  const totalCount = goals.length;
+  const totalCompleted = goals.filter((g) => g.completed_at !== null).length;
+  const overallPct = totalCount > 0 ? (totalCompleted / totalCount) * 100 : 0;
+
+  const filtered = filter === "tous" ? goals : goals.filter((g) => g.type === filter);
+  const pending = filtered.filter((g) => g.completed_at === null);
+  const completed = filtered.filter((g) => g.completed_at !== null);
 
   function toggle(id: string, completed: boolean) {
+    if (completed) fireConfetti();
     startTransition(async () => {
       await setActivityGoalCompleted(id, completed);
     });
   }
 
-  function completeSession(id: string) {
+  function completeSession(goal: ActivityGoal) {
+    const isLastSession = !!goal.program && goal.program_progress + 1 >= goal.program.length;
+    if (isLastSession) fireConfetti();
     startTransition(async () => {
-      await completeNextSession(id);
+      await completeNextSession(goal.id);
     });
   }
 
@@ -255,6 +274,38 @@ export function ActivityGoalsSection({ goals, streak }: { goals: ActivityGoal[];
         )}
       </div>
 
+      <div className="flex flex-col gap-2">
+        <div className="h-3 w-full overflow-hidden rounded-full bg-background border border-border">
+          <div
+            className="h-full rounded-full transition-all"
+            style={{
+              width: `${overallPct}%`,
+              background: "linear-gradient(90deg, var(--accent), var(--course), var(--velo))",
+            }}
+          />
+        </div>
+        <p className="text-lg text-muted">
+          {totalCompleted}/{totalCount} défis complétés
+        </p>
+      </div>
+
+      <div className="flex gap-2 flex-wrap">
+        {FILTERS.map((f) => (
+          <button
+            key={f.value}
+            onClick={() => setFilter(f.value)}
+            className="rounded-full px-4 py-2 text-lg font-medium border"
+            style={
+              filter === f.value
+                ? { background: "var(--foreground)", color: "var(--background)", borderColor: "var(--foreground)" }
+                : { borderColor: "var(--border)", color: "var(--muted)" }
+            }
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {pending.length > 0 && (
         <ul className="flex flex-col gap-3">
           {pending.map((goal) => (
@@ -263,7 +314,7 @@ export function ActivityGoalsSection({ goals, streak }: { goals: ActivityGoal[];
               goal={goal}
               isPending={isPending}
               onComplete={() => toggle(goal.id, true)}
-              onCompleteSession={() => completeSession(goal.id)}
+              onCompleteSession={() => completeSession(goal)}
             />
           ))}
         </ul>
