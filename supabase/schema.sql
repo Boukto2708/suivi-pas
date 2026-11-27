@@ -40,6 +40,12 @@ create table if not exists activity_goals (
   label text not null,
   type text not null check (type in ('course', 'marche')),
   completed_at timestamptz,
+  -- Programme progressif optionnel : liste ordonnée de séances
+  -- [{"title": "...", "duration": "...", "detail": "..."}, ...]. Nul si l'objectif
+  -- n'a pas de programme (coché directement, sans étapes intermédiaires).
+  program jsonb,
+  -- Nombre de séances du programme déjà marquées comme faites.
+  program_progress integer not null default 0,
   created_at timestamptz not null default now()
 );
 

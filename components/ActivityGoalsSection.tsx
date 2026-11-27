@@ -1,11 +1,104 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createActivityGoal, deleteActivityGoal, setActivityGoalCompleted } from "@/lib/actions/activityGoals";
+import {
+  completeNextSession,
+  createActivityGoal,
+  deleteActivityGoal,
+  setActivityGoalCompleted,
+} from "@/lib/actions/activityGoals";
 import { ACTIVITY_TYPE_LABELS, type ActivityGoal, type ActivityType } from "@/lib/types";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+}
+
+function PendingGoalItem({
+  goal,
+  isPending,
+  onComplete,
+  onCompleteSession,
+}: {
+  goal: ActivityGoal;
+  isPending: boolean;
+  onComplete: () => void;
+  onCompleteSession: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const program = goal.program;
+
+  if (!program || program.length === 0) {
+    return (
+      <li className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background px-5 py-4">
+        <div>
+          <p className="text-xl font-semibold">{goal.label}</p>
+          <p className="text-lg text-muted">{ACTIVITY_TYPE_LABELS[goal.type]}</p>
+        </div>
+        <button
+          onClick={onComplete}
+          disabled={isPending}
+          className="shrink-0 rounded-lg bg-accent px-5 py-3 text-xl font-semibold text-accent-foreground disabled:opacity-60"
+        >
+          ✓ Fait
+        </button>
+      </li>
+    );
+  }
+
+  const currentSession = program[goal.program_progress];
+
+  return (
+    <li className="rounded-xl border border-border bg-background px-5 py-4 flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-xl font-semibold">{goal.label}</p>
+          <p className="text-lg text-muted">
+            {ACTIVITY_TYPE_LABELS[goal.type]} — Séance {goal.program_progress + 1}/{program.length}
+          </p>
+        </div>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="shrink-0 text-lg text-muted underline underline-offset-4"
+        >
+          {expanded ? "Masquer" : "Voir le programme"}
+        </button>
+      </div>
+
+      <div className="rounded-lg bg-surface border border-border px-4 py-3">
+        <p className="text-lg font-semibold">
+          {currentSession.title} <span className="text-muted font-normal">({currentSession.duration})</span>
+        </p>
+        <p className="text-lg text-muted mt-1">{currentSession.detail}</p>
+      </div>
+
+      {expanded && (
+        <ul className="flex flex-col gap-2">
+          {program.map((session, i) => (
+            <li
+              key={i}
+              className={`text-lg px-3 py-2 rounded-lg ${
+                i < goal.program_progress
+                  ? "text-muted line-through"
+                  : i === goal.program_progress
+                    ? "font-semibold"
+                    : "text-muted"
+              }`}
+            >
+              {session.title} ({session.duration})
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <button
+        onClick={onCompleteSession}
+        disabled={isPending}
+        className="w-full rounded-lg bg-accent px-5 py-3 text-xl font-semibold text-accent-foreground disabled:opacity-60"
+      >
+        ✓ Séance faite
+      </button>
+    </li>
+  );
 }
 
 export function ActivityGoalsSection({ goals, streak }: { goals: ActivityGoal[]; streak: number }) {
@@ -39,6 +132,12 @@ export function ActivityGoalsSection({ goals, streak }: { goals: ActivityGoal[];
   function toggle(id: string, completed: boolean) {
     startTransition(async () => {
       await setActivityGoalCompleted(id, completed);
+    });
+  }
+
+  function completeSession(id: string) {
+    startTransition(async () => {
+      await completeNextSession(id);
     });
   }
 
@@ -97,22 +196,13 @@ export function ActivityGoalsSection({ goals, streak }: { goals: ActivityGoal[];
       {pending.length > 0 && (
         <ul className="flex flex-col gap-3">
           {pending.map((goal) => (
-            <li
+            <PendingGoalItem
               key={goal.id}
-              className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background px-5 py-4"
-            >
-              <div>
-                <p className="text-xl font-semibold">{goal.label}</p>
-                <p className="text-lg text-muted">{ACTIVITY_TYPE_LABELS[goal.type]}</p>
-              </div>
-              <button
-                onClick={() => toggle(goal.id, true)}
-                disabled={isPending}
-                className="shrink-0 rounded-lg bg-accent px-5 py-3 text-xl font-semibold text-accent-foreground disabled:opacity-60"
-              >
-                ✓ Fait
-              </button>
-            </li>
+              goal={goal}
+              isPending={isPending}
+              onComplete={() => toggle(goal.id, true)}
+              onCompleteSession={() => completeSession(goal.id)}
+            />
           ))}
         </ul>
       )}

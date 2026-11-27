@@ -25,11 +25,19 @@ export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
   marche: "Marche",
 };
 
+export interface ProgramSession {
+  title: string;
+  duration: string;
+  detail: string;
+}
+
 export interface ActivityGoal {
   id: string;
   label: string;
   type: ActivityType;
   completed_at: string | null;
+  program: ProgramSession[] | null;
+  program_progress: number;
   created_at: string;
 }
 
