@@ -1,4 +1,4 @@
-import { daysLeftInYear, dailyPaceNeeded, progressPercent, remainingSteps, totalStepsWalked } from "@/lib/calculations";
+import { progressPercent, remainingSteps, totalStepsWalked } from "@/lib/calculations";
 import type { StepEntry, StepGoal } from "@/lib/types";
 
 function formatSteps(n: number): string {
@@ -9,8 +9,6 @@ export function ProgressDisplay({ goal, entries }: { goal: StepGoal; entries: St
   const remaining = remainingSteps(goal, entries);
   const walked = totalStepsWalked(entries);
   const pct = progressPercent(goal, entries);
-  const daysLeft = daysLeftInYear(goal.year);
-  const pace = dailyPaceNeeded(remaining, daysLeft);
   const reached = remaining <= 0;
 
   return (
@@ -35,14 +33,6 @@ export function ProgressDisplay({ goal, entries }: { goal: StepGoal; entries: St
       <p className="text-lg text-muted">
         {formatSteps(walked)} pas faits sur {formatSteps(goal.target_steps)} ({pct.toFixed(1)} %)
       </p>
-
-      {!reached && (
-        <p className="text-lg text-muted">
-          {daysLeft > 0
-            ? `Soit environ ${formatSteps(pace)} pas par jour sur les ${daysLeft} jours restants.`
-            : "L'année est terminée."}
-        </p>
-      )}
     </div>
   );
 }

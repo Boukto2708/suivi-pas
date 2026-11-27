@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Suivi Pas",
+  title: "Bastide summerbody",
   description: "Suivi du nombre de pas sur l'année",
   manifest: "/manifest.json",
 };

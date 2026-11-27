@@ -31,7 +31,7 @@ export default async function Home() {
           className="bg-clip-text text-transparent"
           style={{ backgroundImage: "linear-gradient(90deg, var(--accent), var(--course))" }}
         >
-          Suivi Pas {year}
+          Bastide summerbody
         </span>
       </h1>
 
@@ -40,7 +40,6 @@ export default async function Home() {
       ) : (
         <>
           <ProgressDisplay goal={goal} entries={entries} />
-          <AddStepsForm year={year} />
           <GoalSetup year={year} currentTarget={goal.target_steps} compact />
           <h2 className="text-2xl font-semibold mt-2">📅 Historique</h2>
           <EntriesHistory entries={entries} />
@@ -49,6 +48,8 @@ export default async function Home() {
 
       <ActivityGoalsSection goals={activityGoals} streak={streak} />
       <RewardsSection rewards={rewards} completedCount={completedCount} />
+
+      {goal && <AddStepsForm year={year} />}
     </main>
   );
 }

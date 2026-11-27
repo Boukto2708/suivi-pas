@@ -11,6 +11,7 @@ function todayIso(): string {
 }
 
 export function AddStepsForm({ year }: { year: number }) {
+  const [open, setOpen] = useState(false);
   const [steps, setSteps] = useState("");
   const [date, setDate] = useState(todayIso());
   const [note, setNote] = useState("");
@@ -31,11 +32,23 @@ export function AddStepsForm({ year }: { year: number }) {
       setSteps("");
       setNote("");
       setDate(todayIso());
+      setOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur lors de l'ajout.");
     } finally {
       setSaving(false);
     }
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="text-lg text-muted underline underline-offset-4 self-center"
+      >
+        + Ajouter des pas manuellement
+      </button>
+    );
   }
 
   return (
@@ -55,6 +68,7 @@ export function AddStepsForm({ year }: { year: number }) {
         value={steps}
         onChange={(e) => setSteps(e.target.value)}
         className="w-full rounded-xl border border-border bg-background px-5 py-5 text-4xl font-mono tabular-nums outline-none focus:border-accent"
+        autoFocus
       />
 
       <label htmlFor="date" className="text-lg text-muted">
@@ -78,13 +92,22 @@ export function AddStepsForm({ year }: { year: number }) {
 
       {error && <p className="text-lg text-red-600">{error}</p>}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-full rounded-xl bg-accent px-6 py-5 text-3xl font-semibold text-accent-foreground disabled:opacity-60"
-      >
-        {saving ? "Ajout..." : "Ajouter"}
-      </button>
+      <div className="flex gap-3">
+        <button
+          type="submit"
+          disabled={saving}
+          className="flex-1 rounded-xl bg-accent px-6 py-5 text-3xl font-semibold text-accent-foreground disabled:opacity-60"
+        >
+          {saving ? "Ajout..." : "Ajouter"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="rounded-xl border border-border px-6 py-5 text-2xl"
+        >
+          Annuler
+        </button>
+      </div>
     </form>
   );
 }
