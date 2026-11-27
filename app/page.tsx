@@ -27,9 +27,6 @@ export default async function Home() {
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-8">
       <h1 className="text-center text-4xl font-bold">Suivi Pas {year}</h1>
 
-      <ActivityGoalsSection goals={activityGoals} streak={streak} />
-      <RewardsSection rewards={rewards} completedCount={completedCount} />
-
       {!goal ? (
         <GoalSetup year={year} />
       ) : (
@@ -41,6 +38,9 @@ export default async function Home() {
           <EntriesHistory entries={entries} />
         </>
       )}
+
+      <ActivityGoalsSection goals={activityGoals} streak={streak} />
+      <RewardsSection rewards={rewards} completedCount={completedCount} />
     </main>
   );
 }
