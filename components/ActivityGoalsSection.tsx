@@ -19,79 +19,84 @@ function PendingGoalItem({
   onComplete: () => void;
   onCompleteSession: () => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [showFullProgram, setShowFullProgram] = useState(false);
   const program = goal.program;
 
-  if (!program || program.length === 0) {
-    return (
-      <li className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background px-5 py-4">
-        <div>
-          <p className="text-xl font-semibold">{goal.label}</p>
-          <p className="text-lg text-muted">{ACTIVITY_TYPE_LABELS[goal.type]}</p>
-        </div>
-        <button
-          onClick={onComplete}
-          disabled={isPending}
-          className="shrink-0 rounded-lg bg-accent px-5 py-3 text-xl font-semibold text-accent-foreground disabled:opacity-60"
-        >
-          ✓ Fait
-        </button>
-      </li>
-    );
-  }
-
-  const currentSession = program[goal.program_progress];
-
   return (
-    <li className="rounded-xl border border-border bg-background px-5 py-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-xl font-semibold">{goal.label}</p>
-          <p className="text-lg text-muted">
-            {ACTIVITY_TYPE_LABELS[goal.type]} — Séance {goal.program_progress + 1}/{program.length}
-          </p>
-        </div>
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          className="shrink-0 text-lg text-muted underline underline-offset-4"
-        >
-          {expanded ? "Masquer" : "Voir le programme"}
-        </button>
-      </div>
-
-      <div className="rounded-lg bg-surface border border-border px-4 py-3">
-        <p className="text-lg font-semibold">
-          {currentSession.title} <span className="text-muted font-normal">({currentSession.duration})</span>
-        </p>
-        <p className="text-lg text-muted mt-1">{currentSession.detail}</p>
-      </div>
-
-      {expanded && (
-        <ul className="flex flex-col gap-2">
-          {program.map((session, i) => (
-            <li
-              key={i}
-              className={`text-lg px-3 py-2 rounded-lg ${
-                i < goal.program_progress
-                  ? "text-muted line-through"
-                  : i === goal.program_progress
-                    ? "font-semibold"
-                    : "text-muted"
-              }`}
-            >
-              {session.title} ({session.duration})
-            </li>
-          ))}
-        </ul>
-      )}
-
+    <li className="rounded-xl border border-border bg-background overflow-hidden">
       <button
-        onClick={onCompleteSession}
-        disabled={isPending}
-        className="w-full rounded-lg bg-accent px-5 py-3 text-xl font-semibold text-accent-foreground disabled:opacity-60"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"
       >
-        ✓ Séance faite
+        <p className="text-xl font-semibold">{goal.label}</p>
+        <span className="shrink-0 text-muted text-xl">{open ? "▲" : "▼"}</span>
       </button>
+
+      {open && (
+        <div className="px-5 pb-4 flex flex-col gap-3">
+          {!program || program.length === 0 ? (
+            <>
+              <p className="text-lg text-muted">{ACTIVITY_TYPE_LABELS[goal.type]}</p>
+              <button
+                onClick={onComplete}
+                disabled={isPending}
+                className="w-full rounded-lg bg-accent px-5 py-3 text-xl font-semibold text-accent-foreground disabled:opacity-60"
+              >
+                ✓ Fait
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-lg text-muted">
+                {ACTIVITY_TYPE_LABELS[goal.type]} — Séance {goal.program_progress + 1}/{program.length}
+              </p>
+
+              <div className="rounded-lg bg-surface border border-border px-4 py-3">
+                <p className="text-lg font-semibold">
+                  {program[goal.program_progress].title}{" "}
+                  <span className="text-muted font-normal">({program[goal.program_progress].duration})</span>
+                </p>
+                <p className="text-lg text-muted mt-1">{program[goal.program_progress].detail}</p>
+              </div>
+
+              <button
+                onClick={() => setShowFullProgram((v) => !v)}
+                className="text-lg text-muted underline underline-offset-4 self-start"
+              >
+                {showFullProgram ? "Masquer le programme complet" : "Voir le programme complet"}
+              </button>
+
+              {showFullProgram && (
+                <ul className="flex flex-col gap-2">
+                  {program.map((session, i) => (
+                    <li
+                      key={i}
+                      className={`text-lg px-3 py-2 rounded-lg ${
+                        i < goal.program_progress
+                          ? "text-muted line-through"
+                          : i === goal.program_progress
+                            ? "font-semibold"
+                            : "text-muted"
+                      }`}
+                    >
+                      {session.title} ({session.duration})
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <button
+                onClick={onCompleteSession}
+                disabled={isPending}
+                className="w-full rounded-lg bg-accent px-5 py-3 text-xl font-semibold text-accent-foreground disabled:opacity-60"
+              >
+                ✓ Séance faite
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </li>
   );
 }
