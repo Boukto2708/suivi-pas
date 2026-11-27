@@ -13,19 +13,20 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
 }
 
+const TYPE_BADGE_STYLE: Record<ActivityType, { bg: string; fg: string; emoji: string }> = {
+  course: { bg: "var(--course)", fg: "var(--course-foreground)", emoji: "🏃" },
+  marche: { bg: "var(--accent)", fg: "var(--accent-foreground)", emoji: "🚶" },
+  velo: { bg: "var(--velo)", fg: "var(--velo-foreground)", emoji: "🚴" },
+};
+
 function TypeBadge({ type }: { type: ActivityType }) {
-  const isCourse = type === "course";
+  const { bg, fg, emoji } = TYPE_BADGE_STYLE[type];
   return (
     <span
       className="inline-block rounded-full px-3 py-0.5 text-base font-medium"
-      style={
-        isCourse
-          ? { background: "var(--course)", color: "var(--course-foreground)" }
-          : { background: "var(--accent)", color: "var(--accent-foreground)" }
-      }
+      style={{ background: bg, color: fg }}
     >
-      {isCourse ? "🏃 " : "🚶 "}
-      {ACTIVITY_TYPE_LABELS[type]}
+      {emoji} {ACTIVITY_TYPE_LABELS[type]}
     </span>
   );
 }
@@ -174,7 +175,7 @@ function AddGoalForm() {
         autoFocus
       />
       <div className="flex gap-2">
-        {(["course", "marche"] as ActivityType[]).map((t) => (
+        {(["course", "marche", "velo"] as ActivityType[]).map((t) => (
           <button
             key={t}
             type="button"
@@ -182,9 +183,11 @@ function AddGoalForm() {
             className="flex-1 rounded-xl px-4 py-3 text-xl font-medium border"
             style={
               type === t
-                ? t === "course"
-                  ? { background: "var(--course)", color: "var(--course-foreground)", borderColor: "var(--course)" }
-                  : { background: "var(--accent)", color: "var(--accent-foreground)", borderColor: "var(--accent)" }
+                ? {
+                    background: TYPE_BADGE_STYLE[t].bg,
+                    color: TYPE_BADGE_STYLE[t].fg,
+                    borderColor: TYPE_BADGE_STYLE[t].bg,
+                  }
                 : { borderColor: "var(--border)", color: "var(--muted)" }
             }
           >

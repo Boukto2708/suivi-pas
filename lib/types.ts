@@ -18,11 +18,12 @@ export interface StepEntry {
   created_at: string;
 }
 
-export type ActivityType = "course" | "marche";
+export type ActivityType = "course" | "marche" | "velo";
 
 export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
   course: "Course",
   marche: "Marche",
+  velo: "Vélo",
 };
 
 export interface ProgramSession {

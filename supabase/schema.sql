@@ -38,7 +38,7 @@ create policy "allow all on step_entries" on step_entries
 create table if not exists activity_goals (
   id uuid primary key default gen_random_uuid(),
   label text not null,
-  type text not null check (type in ('course', 'marche')),
+  type text not null check (type in ('course', 'marche', 'velo')),
   completed_at timestamptz,
   -- Programme progressif optionnel : liste ordonnée de séances
   -- [{"title": "...", "duration": "...", "detail": "..."}, ...]. Nul si l'objectif

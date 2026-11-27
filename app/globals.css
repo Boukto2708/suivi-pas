@@ -15,6 +15,9 @@
   --amber: #d97706;
   --amber-soft: #fbbf24;
   --amber-foreground: #ffffff;
+  --velo: #ea580c;
+  --velo-soft: #fb923c;
+  --velo-foreground: #ffffff;
 }
 
 @theme inline {
@@ -32,6 +35,9 @@
   --color-amber: var(--amber);
   --color-amber-soft: var(--amber-soft);
   --color-amber-foreground: var(--amber-foreground);
+  --color-velo: var(--velo);
+  --color-velo-soft: var(--velo-soft);
+  --color-velo-foreground: var(--velo-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -52,6 +58,9 @@
     --amber: #fbbf24;
     --amber-soft: #fde68a;
     --amber-foreground: #0c0a09;
+    --velo: #fb923c;
+    --velo-soft: #fdba74;
+    --velo-foreground: #0c0a09;
   }
 }
 

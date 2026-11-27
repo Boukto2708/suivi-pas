@@ -48,7 +48,7 @@ export async function createActivityGoal(
 ) {
   const cleanLabel = label.trim();
   if (cleanLabel === "") throw new Error("Le libellé est requis.");
-  if (type !== "course" && type !== "marche") throw new Error("Type invalide.");
+  if (type !== "course" && type !== "marche" && type !== "velo") throw new Error("Type invalide.");
 
   const supabase = createServerSupabaseClient();
   const { error } = await supabase
