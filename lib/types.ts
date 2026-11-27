@@ -17,3 +17,25 @@ export interface StepEntry {
   source: StepEntrySource;
   created_at: string;
 }
+
+export type ActivityType = "course" | "marche";
+
+export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
+  course: "Course",
+  marche: "Marche",
+};
+
+export interface ActivityGoal {
+  id: string;
+  label: string;
+  type: ActivityType;
+  completed_at: string | null;
+  created_at: string;
+}
+
+export interface Reward {
+  id: string;
+  label: string;
+  threshold: number;
+  created_at: string;
+}

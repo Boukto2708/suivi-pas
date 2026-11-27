@@ -1,20 +1,34 @@
 import { getGoalForYear } from "@/lib/actions/goals";
 import { listEntriesForYear } from "@/lib/actions/entries";
-import { currentYear } from "@/lib/calculations";
+import { listActivityGoals } from "@/lib/actions/activityGoals";
+import { listRewards } from "@/lib/actions/rewards";
+import { completedGoalsCount, computeStreak, currentYear } from "@/lib/calculations";
 import { GoalSetup } from "@/components/GoalSetup";
 import { ProgressDisplay } from "@/components/ProgressDisplay";
 import { AddStepsForm } from "@/components/AddStepsForm";
 import { EntriesHistory } from "@/components/EntriesHistory";
+import { ActivityGoalsSection } from "@/components/ActivityGoalsSection";
+import { RewardsSection } from "@/components/RewardsSection";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const year = currentYear();
-  const [goal, entries] = await Promise.all([getGoalForYear(year), listEntriesForYear(year)]);
+  const [goal, entries, activityGoals, rewards] = await Promise.all([
+    getGoalForYear(year),
+    listEntriesForYear(year),
+    listActivityGoals(),
+    listRewards(),
+  ]);
+  const streak = computeStreak(activityGoals);
+  const completedCount = completedGoalsCount(activityGoals);
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-8">
       <h1 className="text-center text-4xl font-bold">Suivi Pas {year}</h1>
+
+      <ActivityGoalsSection goals={activityGoals} streak={streak} />
+      <RewardsSection rewards={rewards} completedCount={completedCount} />
 
       {!goal ? (
         <GoalSetup year={year} />

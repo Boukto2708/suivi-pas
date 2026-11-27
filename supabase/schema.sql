@@ -32,3 +32,30 @@ alter table step_entries enable row level security;
 drop policy if exists "allow all on step_entries" on step_entries;
 create policy "allow all on step_entries" on step_entries
   for all using (true) with check (true);
+
+-- Défis courir/marcher : une liste libre d'objectifs à cocher, pour motiver
+-- en particulier la course (le pas n'y suffit pas).
+create table if not exists activity_goals (
+  id uuid primary key default gen_random_uuid(),
+  label text not null,
+  type text not null check (type in ('course', 'marche')),
+  completed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists rewards (
+  id uuid primary key default gen_random_uuid(),
+  label text not null,
+  threshold integer not null check (threshold > 0),
+  created_at timestamptz not null default now()
+);
+
+alter table activity_goals enable row level security;
+drop policy if exists "allow all on activity_goals" on activity_goals;
+create policy "allow all on activity_goals" on activity_goals
+  for all using (true) with check (true);
+
+alter table rewards enable row level security;
+drop policy if exists "allow all on rewards" on rewards;
+create policy "allow all on rewards" on rewards
+  for all using (true) with check (true);
