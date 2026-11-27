@@ -14,6 +14,9 @@ create table if not exists step_entries (
   date date not null,
   steps bigint not null check (steps > 0),
   note text,
+  -- 'healthkit' pour les entrées synchronisées automatiquement depuis l'app Santé
+  -- (via un raccourci iOS), nul pour une saisie manuelle.
+  source text,
   created_at timestamptz not null default now()
 );
 

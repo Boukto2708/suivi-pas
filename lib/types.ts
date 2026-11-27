@@ -6,11 +6,14 @@ export interface StepGoal {
   updated_at: string;
 }
 
+export type StepEntrySource = "healthkit" | null;
+
 export interface StepEntry {
   id: string;
   year: number;
   date: string;
   steps: number;
   note: string | null;
+  source: StepEntrySource;
   created_at: string;
 }
