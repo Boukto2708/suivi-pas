@@ -1,13 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import {
-  completeNextSession,
-  createActivityGoal,
-  deleteActivityGoal,
-  setActivityGoalCompleted,
-} from "@/lib/actions/activityGoals";
-import { ACTIVITY_TYPE_LABELS, type ActivityGoal, type ActivityType } from "@/lib/types";
+import { completeNextSession, deleteActivityGoal, setActivityGoalCompleted } from "@/lib/actions/activityGoals";
+import { ACTIVITY_TYPE_LABELS, type ActivityGoal } from "@/lib/types";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
@@ -102,32 +97,10 @@ function PendingGoalItem({
 }
 
 export function ActivityGoalsSection({ goals, streak }: { goals: ActivityGoal[]; streak: number }) {
-  const [label, setLabel] = useState("");
-  const [type, setType] = useState<ActivityType>("course");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const pending = goals.filter((g) => g.completed_at === null);
   const completed = goals.filter((g) => g.completed_at !== null);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (label.trim() === "") {
-      setError("Entre un libellé.");
-      return;
-    }
-    setSaving(true);
-    setError("");
-    try {
-      await createActivityGoal(label, type);
-      setLabel("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur lors de l'ajout.");
-    } finally {
-      setSaving(false);
-    }
-  }
 
   function toggle(id: string, completed: boolean) {
     startTransition(async () => {
@@ -158,40 +131,6 @@ export function ActivityGoalsSection({ goals, streak }: { goals: ActivityGoal[];
           </span>
         )}
       </div>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
-          type="text"
-          placeholder="Ex: Courir 20 minutes"
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-xl outline-none focus:border-accent"
-        />
-        <div className="flex gap-2">
-          {(["course", "marche"] as ActivityType[]).map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setType(t)}
-              className={`flex-1 rounded-xl px-4 py-3 text-xl font-medium border ${
-                type === t
-                  ? "bg-accent text-accent-foreground border-accent"
-                  : "border-border text-muted"
-              }`}
-            >
-              {ACTIVITY_TYPE_LABELS[t]}
-            </button>
-          ))}
-        </div>
-        {error && <p className="text-lg text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full rounded-xl bg-accent px-6 py-4 text-2xl font-semibold text-accent-foreground disabled:opacity-60"
-        >
-          {saving ? "Ajout..." : "Ajouter l'objectif"}
-        </button>
-      </form>
 
       {pending.length > 0 && (
         <ul className="flex flex-col gap-3">
